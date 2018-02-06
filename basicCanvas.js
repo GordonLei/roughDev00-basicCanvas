@@ -7,11 +7,16 @@ c.fillStyle = "#000000";
 var clearButton = document.getElementById("clearButton");
 var toggleButton = document.getElementById("toggleButton");
 var currentShape = "circle";
+//temp values have null because they dont exist. If you use 0,0 you could connect to the upper left corner
+var tempX = null;
+var tempY = null;
 
 //Functions
 var clearCanvas = function(e) {
     console.log("cleared canvas");
     context.clearRect(0, 0, canvas.width, canvas.height);
+    tempX = null;
+    tempY = null;
 };
 
 var toggleShape = function(e) {
@@ -30,16 +35,53 @@ var draw = function(e){
     var clickY = e.offsetY;
     console.log("clickX: " + clickX + "    clickY: " + clickY);
     if (currentShape == "circle"){
+        //draw the new point
         context.beginPath();
-        context.arc(clickX,clickY,25,0,2*Math.PI);
+        context.arc(clickX,clickY,10,0,2*Math.PI);
+        //see if this is the beginning of a point
+        if (tempX == null || tempY == null){
+            tempX = clickX;
+            tempY = clickY;
+        }
+        else{
+            //if not first point, go to the previous point then draw a line to the clicked point
+            context.moveTo(tempX,tempY);
+            context.lineTo(clickX, clickY);
+            tempX = clickX;
+            tempY = clickY;
+        }
+        //end
         context.stroke();
         context.fill();
     }
     else{
-        context.fillRect(clickX,clickY,25,25);
+        //draw point
+        //context.beginPath();
+        /*
+
+        RECTANGLE CANNOT CONNECT TO EACH OTHER (YET) BECAUSE RECTANGLES ARE NOT PATH SO 
+        THE FUNCTIONS FOR PATHS DONT DO ANYTHING HERE
+
+        */
+        context.fillRect(clickX,clickY,10,10);
+        //check if beginning of path
+        if (tempX == null || tempY == null){
+            console.log("new rectangle point");
+            tempX = clickX;
+            tempY = clickY;
+        }
+        //if not draw lines connecting previous point to new point
+        else{
+            console.log("drawing line between points");
+            //if not first point, go to the previous point then draw a line to the clicked point
+            context.moveTo(tempX,tempY);
+            context.lineTo(clickX, clickY);
+            tempX = clickX;
+            tempY = clickY;
+        }
     }
-    
 }
+
 
 //Add event listeners
 c.addEventListener("click", draw);
